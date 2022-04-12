@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getPost, getPosts } from '../api/post'
 import { Picker_Picture, Post, PostContent, User } from '../api/types'
+import { getAllUser } from '../api/user'
 import Field from '../private/Field'
 import ImageGalleryPicker from './ImageGalleryPicker'
 
@@ -29,16 +30,23 @@ const EditPost = () => {
     let { id } = useParams() // post id from url
     const navigate = useNavigate() // create a navigate function instance
 
-    async function _getPost(id: number){
-        
+    async function _getPost(id: number){  
         const data = await getPost(id);
         convertToFormData(data);
     }
 
     useEffect(() => {
-
         _getPost(Number(id));
     }, [id]);
+
+    async function _getUsers(){
+        const data = await getAllUser();
+        setUsers(data);
+    }
+
+    useEffect(() => {
+        _getUsers();
+    }, []);
 
     function handleModalPictureSubmit(picture: Picker_Picture) {
         setFormData({
@@ -105,7 +113,7 @@ const EditPost = () => {
         if (formData.userId) {
             // [WORK]
             // You need to find the author name with the server
-            return '[TO DO]'
+            return formData.userId
         } else {
             return 'Unknown author'
         }
