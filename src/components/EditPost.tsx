@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getPost, getPosts } from '../api/post'
+import { createPost, getPost, updatePost } from '../api/post'
 import { Picker_Picture, Post, PostContent, User } from '../api/types'
 import { getAllUser } from '../api/user'
 import Field from '../private/Field'
@@ -35,14 +35,13 @@ const EditPost = () => {
         convertToFormData(data);
     }
 
-    useEffect(() => {
-        _getPost(Number(id));
-    }, [id]);
-
     async function _getUsers(){
         const data = await getAllUser();
         setUsers(data);
     }
+    useEffect(() => {
+        _getPost(Number(id));
+    }, [id]);
 
     useEffect(() => {
         _getUsers();
@@ -60,6 +59,14 @@ const EditPost = () => {
     ) {
         // remove default reloading page
         event.preventDefault()
+        console.log(formData)
+        if(id)
+        {
+            await updatePost(formData as Post)
+        }
+        else {
+            await createPost(formData)
+        }
 
         // back to Home
         navigate('/')
@@ -113,10 +120,12 @@ const EditPost = () => {
         if (formData.userId) {
             // [WORK]
             // You need to find the author name with the server
-            return formData.userId
-        } else {
+            const selectedUser = users.find((user) => user.id === formData.userId)
+            if (selectedUser){
+                return selectedUser.name
+            }
+        } 
             return 'Unknown author'
-        }
     }
 
     return (
@@ -124,7 +133,6 @@ const EditPost = () => {
             <form className="post-form" onSubmit={handleAddOrCreatePost}>
                 <Field label="Title">
                     <input
-                        onBlur={handleChange}
                         name="title"
                         className="input"
                         type="text"
@@ -135,7 +143,6 @@ const EditPost = () => {
                 </Field>
                 <Field label="Content">
                     <textarea
-                        onBlur={handleChange}
                         name="body"
                         className="textarea"
                         placeholder="e.g. Hello world"
