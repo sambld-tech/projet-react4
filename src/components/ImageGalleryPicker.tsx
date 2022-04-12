@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Gallery from 'react-photo-gallery'
+import { getAllPicture } from '../api/photo'
 import { Picker_Picture, API_Picture } from '../api/types'
 import SelectedImage from '../private/SelectedImage'
 
@@ -13,10 +14,14 @@ const ImageGalleryPicker = ({ onClose, onSubmit }: ImageGalleryPickerProps) => {
         useState<null | Picker_Picture>(null)
     const [pictures, setPictures] = useState<Array<API_Picture>>([])
 
-    async function _getPictures() {
-        const data = await _getPictures()
+    async function _getPicture() {
+        const data = await getAllPicture()
         setPictures(data)
     }
+
+    useEffect( () => {
+        _getPicture()
+    },[])
     function handleOnClick(picture: Picker_Picture) {
         setSelectedPicture(picture)
     }
